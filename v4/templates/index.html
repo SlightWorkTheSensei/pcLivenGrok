@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ngrok Tunnel Manager with QR Codes</title>
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #000000;
+            color: #00ffff;
+        }
+        h1, h2 {
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ff00ff;
+            background-color: #000000;
+            color: #00ffff;
+            outline: none;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+        }
+        button {
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #ff00ff;
+            color: #000000;
+            box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+        }
+        a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        a:hover {
+            color: #ff00ff;
+        }
+        img {
+            margin-top: 10px;
+            max-width: 250px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+        label {
+            font-size: 18px;
+        }
+        p {
+            color: #ff00ff;
+        }
+        .tunnel-block {
+            margin: 30px auto;
+            padding: 20px;
+            border: 2px solid #ff00ff;
+            border-radius: 10px;
+            width: 80%;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>ngrok Tunnel Manager with QR Codes</h1>
+
+    <!-- Form to start new tunnel -->
+    <form action="/start_tunnel" method="POST">
+        <label for="port">Enter Port to Expose:</label><br>
+        <input type="text" id="port" name="port" placeholder="e.g., 8080" required><br>
+        <button type="submit">Start Tunnel</button>
+    </form>
+
+    <!-- Show success or error message -->
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
+    <!-- Display all active tunnels -->
+    {% if tunnels %}
+        <h2>Active Tunnels</h2>
+        {% for port, tunnel in tunnels.items() %}
+        <div class="tunnel-block">
+            <h3>Port: {{ port }}</h3>
+            <p><a href="{{ tunnel.public_url }}" target="_blank">{{ tunnel.public_url }}</a></p>
+            <img src="/static/qrcode_{{ port }}.png" alt="QR for {{ tunnel.public_url }}">
+            
+            <!-- Stop button for this specific port -->
+            <form action="/stop_tunnel" method="POST">
+                <input type="hidden" name="port" value="{{ port }}">
+                <button type="submit">Stop Tunnel on Port {{ port }}</button>
+            </form>
+        </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
